@@ -1,0 +1,87 @@
+
+.hello{
+  font-size: 30px;
+
+ 
+      
+}
+.newUser {
+    flex: 4;
+  }
+  
+  .newUserForm {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .logocli {
+    height: 130px;
+    width: 100px;
+    border-radius: 15px;
+    margin-top:-1000px;
+    margin-left:1250px;
+    margin-bottom: -5%;
+  } 
+  .newUserItem {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    margin-right: 20px;
+  }
+  
+  .newUserItem > label {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(78, 73, 73);
+    margin-left: 10px;
+  }
+  
+  .newUserItem > input {
+    height: 20px;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-left: 10px;
+  }
+  
+  .newUserGender > input {
+    margin-top: 15px;
+  }
+  
+  .newUserGender>label{
+      margin: 10px;
+      font-size: 18px;
+      color: #555;
+  }
+  
+  .newUserSelect{
+      height: 40px;
+      border-radius: 5px;
+  }
+  
+  .newUserButton{
+      width: 250px;
+      border: none;
+      background-color: black;
+      color: white;
+      padding: 7px 10px;
+      font-weight: 200;
+      border-radius: 50px;
+      margin-top: 30px;
+      margin-left: 100px;
+      cursor: pointer;
+      font-size: 20px;
+  }
+  .newUserTitle{
+    font-family: Courier New, monospace;
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 10px;
+  }
+h1{
+    font-family: Courier New, monospace;
+    text-align: center;
+    margin-top: 15px;
+}
+

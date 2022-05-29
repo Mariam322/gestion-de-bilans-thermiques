@@ -1,0 +1,139 @@
+.newUserItemE {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    margin-top: -65px;
+    margin-right: 20px;
+    margin-left:550px;
+  
+  }
+  
+  .newUserItemE > label {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(78, 73, 73);
+    margin-left: 8px;
+  }
+  .select{
+    margin-left: 8px;
+  }
+  
+  .newUserItemE > input {
+    height:15px;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-left: 10px;
+  }
+
+
+  .newUserItem {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    margin-right: 20px;
+  
+  }
+  .compo{
+    margin-left: 5px;
+    height: 457px;
+    width: 1245px;
+  }
+  
+  .newUserItem > label {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(78, 73, 73);
+    margin-left: 8px;
+  }
+  
+  .newUserItem > input {
+    height: 20px;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-left: 10px;
+  }
+
+ table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    border: 1px solid gray; 
+ 
+ }
+ th, td {
+    border: 1px solid gray;
+    border-radius: 2px;
+    text-align: center;
+ }
+/* Panneaux Sand*/
+.newUserItemED {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  margin-top: -65px;
+  margin-right: 20px;
+  margin-left:550px;
+
+}
+
+.newUserItemED > label {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(78, 73, 73);
+  margin-left: 8px;
+}
+
+.newUserItemE > input:disabled {
+  height:15px;
+  padding: 10px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  margin-left: 30px;
+}
+.newUserItemE > input:enabled {
+  
+  height:15px;
+  padding: 10px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  margin-left: 20px;
+}
+.nature> input{
+background-color:darkgrey;
+ color:white;
+ height: 20px;
+ padding: 10px;
+ border: 1px solid gray;
+ border-radius: 5px;
+ margin-left: 1050px;
+
+}
+.field{
+  margin-left: 5px;
+}
+.Mur1{
+  margin-left: 2px;
+  height: 750px;
+  width: 1000px;
+}
+.Mur2{
+  margin-left: 2px;
+  height: 750px;
+  width: 1255px;
+}
+ .plancher{
+  margin-left: 2px;
+  height: 680px;
+  width: 1255px;
+ }
+ .Porte{
+  margin-left: 2px;
+  height: 900px;
+  width: 1255px; 
+ }

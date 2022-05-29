@@ -1,0 +1,88 @@
+
+.hello{
+  font-size: 30px;
+
+ 
+      
+}
+.newProjet {
+    flex: 4;
+  }
+  
+  .newProjectForm {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .newProjectItem {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    margin-right: 20px;
+  }
+  
+  .newProjectItem > label {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(78, 73, 73);
+    margin-left: 10px;
+  }
+  
+  .newProjectItem > input {
+    height: 20px;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-left: 10px;
+  }
+  
+  .newUserGender > input {
+    margin-top: 15px;
+  }
+  
+  .newUserGender>label{
+      margin: 10px;
+      font-size: 18px;
+      color: #555;
+  }
+  
+  .newUserSelect{
+      height: 40px;
+      border-radius: 5px;
+  }
+  
+  .newProjectButton{
+      width: 250px;
+      border: none;
+      background-color: black;
+      color: white;
+      padding: 7px 10px;
+      font-weight: 200;
+      border-radius: 50px;
+      margin-top: 30px;
+      margin-left: 100px;
+      cursor: pointer;
+      font-size: 20px;
+  }
+  .newProjectTitle{
+    font-family: Courier New, monospace;
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 10px;
+  }
+h1{
+    font-family: Courier New, monospace;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.information{
+  height: 30px;
+  width: 30px;
+  margin-left: 410px;
+  margin-top: -300px;
+  margin-bottom: 20px;
+  
+}
