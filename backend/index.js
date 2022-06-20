@@ -57,12 +57,26 @@ app.use(session({
     const mail = req.body.mail;
     const motdepass = req.body.motdepass;
     const roles = req.body.roles;
-    const sqlInsert ="INSERT INTO users(id,nom, prenom, sexe,Route,ville,code_postal,telephone,login,mail,motdepass,roles) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
-    db.query(sqlInsert, [id,nom, prenom, sexe,Route,ville,code_postal,telephone,login,mail,motdepass,roles],(err, result) => {
-        console.log(err);
-
-});
-});
+    const Etat = req.body.Etat;
+    db.query(
+        " SELECT * FROM users WHERE  telephone=?  or mail=?",
+        [telephone,mail],function(err,result){
+            if (result.length >0){
+                res.send('existe!');
+        } else {
+               
+            const sqlInsert ="INSERT INTO users(id,nom, prenom, sexe,Route,ville,code_postal,telephone,login,mail,motdepass,roles,Etat) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            db.query(sqlInsert, [id,nom, prenom, sexe,Route,ville,code_postal,telephone,login,mail,motdepass,roles,Etat],(err, result) => {
+                console.log(err);
+        
+     
+       
+            }
+            )}
+    
+        });
+        
+            });
 //select user by id
 app.get("/getuser/:id", (req, res) => {
     let sql = 'SELECT * FROM users WHERE id= '+req.params.id;
@@ -71,8 +85,16 @@ app.get("/getuser/:id", (req, res) => {
        
     });
 });
+//select  nom user by id
+app.get("/getnomuser/:id", (req, res) => {
+    let sql = 'SELECT nom,prenom FROM users WHERE id= '+req.params.id;
+    let query = db.query(sql, (err,results) => {
+        res.send(results);
+       
+    });
+});
     app.get('/getusers', (req, res) => {
-        let sql = 'SELECT * FROM users  WHERE roles ="Empolye" ';
+        let sql = 'SELECT * FROM users  WHERE roles ="Employee" ';
         let query = db.query(sql, (err,result) => {
             res.send(result);
           
@@ -98,7 +120,7 @@ app.get("/getuser/:id", (req, res) => {
     });
 
 
-    app.put("/updateuser/:id",(req,res)=>{
+     app.put("/updateuser/:id",(req,res)=>{
      
         const nom =req.body.nom;
         const prenom =req.body.prenom;
@@ -110,9 +132,11 @@ app.get("/getuser/:id", (req, res) => {
         const login = req.body.login;
         const mail = req.body.mail;
         const motdepass = req.body.motdepass;
+        const roles = req.body.roles;
+        const Etat = req.body.Etat;
        
-        const sqlinsert="UPDATE users SET nom=?,prenom=?,sexe=?,Route=?,ville=?,code_postal=?,telephone=?,login=?,mail=?,motdepass=? WHERE id="+req.params.id ;
-        db.query(sqlinsert,[nom,prenom,sexe,Route,ville,code_postal,telephone,login,mail,motdepass],(err,res) => {
+        const sqlinsert="UPDATE users SET nom=?,prenom=?,sexe=?,Route=?,ville=?,code_postal=?,telephone=?,login=?,mail=?,motdepass=?,roles=? ,Etat=? WHERE id="+req.params.id ;
+        db.query(sqlinsert,[nom,prenom,sexe,Route,ville,code_postal,telephone,login,mail,motdepass,roles,Etat],(err,res) => {
             console.log(res);
         })
     })
@@ -122,27 +146,40 @@ app.post("/loogin",(req, res)  =>{
   
     const login = req.body.login;
     const motdepass = req.body.motdepass;
-    const roles=req.body.roles
+    const roles=req.body.roles;
+    const Etat= req.body.Etat;
  
-    if (login && motdepass) {
+    if (login && motdepass  ) {
         db.query(
-        "SELECT id,login,motdepass,roles FROM users WHERE login=? and motdepass=? and((roles='Empolye')or(roles='Admin'))",
+        "SELECT id,login,motdepass,roles,Etat FROM users WHERE login=? and motdepass=? and((roles='Employee')or(roles='Admin'))",
         [login, motdepass,roles],function(err,result){if (err) throw err;
-        if (result.length > 0) {
             
+            console.log('laaaaaaaaaaa',result);
+            console.log(result.Etat);
+
+            if (result.length > 0)  {
+            if (result[0].Etat == 'Desactive') {
+                return res.status(200).send({message:'Votre compte a été désactivé !'})
+            }
            console.log(result);
            res.send(result);
-           
           
-        } else {
-            res.send('Incorrect Username and/or Password!');
+        }
+        
+        
+        else {
+            res.send('login et/ou mot de passe incorrect!');
         }			
         res.end();
     });
-    } else {
-    res.send('Please enter Username and Password!');
+    }   
+
+     else {
+    res.send('Veuillez entrer votre login et votre  mot de passe!');
     res.end();
 }
+
+
 });
 
     //ajouter client
@@ -249,16 +286,16 @@ function sendEmail(mail, token,req) {
         port: 3000, 
         secure: true,
         auth: {
-            user: 'mseddimariam41@gmail.com', // Your email id
-            pass: 'mfwhvhshzpffqfei' // Your password
+            user: 'mseddimariam41@gmail.com', // email
+            pass: 'mfwhvhshzpffqfei' //  password
         }
     });
  
     var mailOptions = {
         from: mail,
         to:mail ,
-        subject: 'Reset Password Link',
-        html: '<p>You requested for reset password, kindly use this <a href="http://localhost:3000/ResetPassword?token=' + token + '">link</a> to reset your password</p>'
+        subject: 'Lien de réinitialisation du mot de passe',
+        html: '<p>Vous avez demandé la réinitialisation du mot de passe, veuillez utiliser<a href="http://localhost:3000/ResetPassword?token=' + token + '"> ce lien </a> pour réinitialiser votre mot de passe</p>'
  
     };
  
@@ -284,7 +321,7 @@ app.post('/forgot',function(req, res, next) {
         var type = ''
         var msg = ''
      
-        if (result[0].mail.length > 0) {
+        if (result[0]) {
  
            var token = randtoken.generate(20);
  
@@ -301,27 +338,32 @@ app.post('/forgot',function(req, res, next) {
                     if(err) throw err
          
                 })
+               
+               
+                res.send({success: true,message:'Le lien de réinitialisation du mot de passe a été envoyé à votre adresse e-mail'}) 
+               return;
  
-                type = 'success';
-                msg = 'The reset password link has been sent to your email address';
- 
-            } else {
-                type = 'error';
-                msg = 'Something goes to wrong. Please try again';
             }
+            
  
         } else {
             console.log('2');
-            type = 'error';
-            msg = 'The Email is not registered with us';
+            res.send({success: false,message:'Impossible de trouver un compte correspondant à cette adresse e-mail'}) 
+            return;
  
+            
         }
-
+       
+       
         console.log(msg)
+   
+       
         req.flash(type, msg);
         res.redirect('/');
        
+    
     });
+
    
 })
 /* reset page */
@@ -346,20 +388,20 @@ app.post('/update-password', function(req, res) {
     if (result) {
     var saltRounds = 10;
     // var hash = bcrypt.hash(password, saltRounds);
-    bcrypt.genSalt(saltRounds, function(err, salt) {
-    bcrypt.hash(motdepass, salt, function(err, hash) {
+
+/*     bcrypt.genSalt(saltRounds, function(err, salt) {
+    bcrypt.hash(motdepass, salt, function(err, hash) { */
     var data = {
-        motdepass:hash,
-      
+        motdepass,
     }
 var mail= req.body.mail;
-    db.query('UPDATE users SET ? WHERE mail =' + mail, data, function(err, result) {
+    db.query('UPDATE users SET ?WHERE token ="' + token + '"', data, function(err, result) {
       
         
     if(err) throw err
     });
-    });
-    });
+/*     });
+    }); */
     type = 'success';
     msg = 'Your password has been updated successfully';
     } else {
@@ -412,21 +454,208 @@ app.get("/getus/:id", (req, res) => {
      //ajouter projet
 app.post("/InsertProjet" , (req, res) => { console.log(req.body)
     //const id = req.body.id;
+    console.log(req.body)
     const nom_projet = req.body.nom_projet;
     const Date_de_création = req.body.Date_de_création;
     const Date_limite = req.body.Date_limite;
     const code_client = req.body.code_client;
+    const id_user = req.body.id_user;
+  
     const standard=req.body.standard;
     const Epaisseur= req.body.Epaisseur;
     const Hauteur=req.body.Hauteur;
 
 
    
-    const sqlInsert ="INSERT INTO projectlist(nom_projet,Date_de_création,Date_limite,standard,Epaisseur,Hauteur,code_client) VALUES(?,?,?,?,?,?,?)";
-    db.query(sqlInsert, [nom_projet,Date_de_création,Date_limite,standard,Epaisseur,Hauteur,code_client],(err, res) => {
+    const sqlInsert ="INSERT INTO projectlist(nom_projet,Date_de_création,Date_limite,standard,Epaisseur,Hauteur,code_client,id_user) VALUES(?,?,?,?,?,?,?,?)";
+    db.query(sqlInsert, [nom_projet,Date_de_création,Date_limite,standard,Epaisseur,Hauteur,code_client,id_user],(err, res1) => {
+        res.status(200).json({id_project : res1.insertId})
+
+        for(let  i = 1 ; i < 5 ; i++ ){
+            
+            const sqlInsert1 ="INSERT INTO mur(Longueur,num_mur,contact_externe,AutreLocal_Mixte,longueur_mixte,id_project) VALUES(?,?,?,?,?,?)";
+            db.query(sqlInsert1, [0,i,'','',0,res1.insertId],(err, res2) => {
+                console.log(err);
+                console.log(res2);
+                const sqlInsert4 ="INSERT INTO composition(Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur,id_mur) VALUES(?,?,?,?,?,?,?,?,?)";
+                db.query(sqlInsert4,['','',0,'','',0,'',0,res2.insertId],(err, res6) => {
+             
+            });
+            })
+        }
+      
+        const sqlInsert2 ="INSERT INTO plafond(longueur,contact_externe,AutreLocal_Mixte,Longueur_Mixte,id_project) VALUES(?,?,?,?,?)";
+        db.query(sqlInsert2, [0,'','',0,res1.insertId],(err, res3) => {
+         const sqlInsert4 ="INSERT INTO composition(Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur,id_plafond) VALUES(?,?,?,?,?,?,?,?,?)";
+            db.query(sqlInsert4,['','',0,'','',0,'',0,res3.insertId],(err, res6) => {
+                console.log(err)
+                console.log(res6)
+            });
+          
+            console.log(err);
+
+    });
+    
+       
+    const sqlInsert3 ="INSERT INTO plancher(contact_externe,vide_sanitaire,epaisseur,id_project) VALUES(?,?,?,?)";
+    db.query(sqlInsert3, ['','',0,res1.insertId],(err, res4) => {
+       /* const sqlInsert4 ="INSERT INTO composition(Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur,id_plancher) VALUES(?,?,?,?,?,?,?,?,?)";
+        db.query(sqlInsert4,['','',0,'','',0,'',0,res4.insertId],(err, res6) => {
+     
+});*/
+        console.log(err);
+        
+});
+
+const sqlInsert4="INSERT INTO porte(orientation,Type_ouverture,Isolation,contact_externe,AutreLocal_Mixte,DimensionNormalise,largeur,hauteur,id_project)  VALUES(?,?,?,?,?,?,?,?,?)";
+db.query(sqlInsert4, ['','','','','','',0,0,res1.insertId],(err, res5) => {
+    console.log(err);
+    
+});
+});
+
+});
+
+   //ajouter Mur
+   app.post("/InsertMur" , (req, res) => { 
+    const id_project = req.body.id_project;
+    const num_mur = req.body.num_mur;
+    const Longueur = req.body.Longueur;
+    const contact_externe = req.body.contact_externe;
+    const AutreLocal_Mixte = req.body.AutreLocal_Mixte;
+    const longueur_mixte=req.body.longueur_mixte;
+
+    //const id_orientation = req.body.id_orientation;
+    const Type_SurfaceExterne = req.body.Type_SurfaceExterne;
+    const Materiaux_SurfaceExterne = req.body.Materiaux_SurfaceExterne;
+    const Epaisseur_SurfaceExterne = req.body.Epaisseur_SurfaceExterne;
+    const Type_SurfaceInterne=req.body.Type_SurfaceInterne;
+
+    const Materiaux_SurfaceInterne = req.body.Materiaux_SurfaceInterne;
+    const Epaisseur_SurfaceInterne = req.body.Epaisseur_SurfaceInterne;
+    const Isolant_Materiaux = req.body.Isolant_Materiaux;
+    const Isolant_Epaisseur=req.body.Isolant_Epaisseur;
+
+
+   
+    const sqlInsert =`UPDATE mur SET  Longueur= ?,contact_externe = ?,AutreLocal_Mixte = ?,longueur_mixte= ? WHERE id_project=${id_project} AND num_mur=${num_mur}`;
+    db.query(sqlInsert, [Longueur,contact_externe,AutreLocal_Mixte,longueur_mixte],(err, res ) => {
+        const sqlInsert2 =`SELECT id_mur FROM mur WHERE id_project=${id_project} AND num_mur=${num_mur}`;
+        db.query(sqlInsert2, (err,res)=>{
+            console.log(res[0].id_mur)
+            const sqlInsert1 =`UPDATE composition SET Type_SurfaceExterne=?,Materiaux_SurfaceExterne=?,Epaisseur_SurfaceExterne=?,Type_SurfaceInterne=?,Materiaux_SurfaceInterne=?,Epaisseur_SurfaceInterne=?,Isolant_Materiaux=?,Isolant_Epaisseur=? WHERE id_mur=${res[0].id_mur}`;
+            db.query(sqlInsert1, [Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur],(err, res) => {
+                console.log(err)
+            })
+        })
+      
+});
+
+});
+
+  //ajouter plafond
+  app.post("/InsertPlafond" , (req, res) => { 
+    //const id_plafond = req.body.id_plafond;
+    const longueur = req.body.longueur;
+    const contact_externe = req.body.contact_externe;
+    const AutreLocal_Mixte= req.body.AutreLocal_Mixte;
+    const Longueur_Mixte=req.body.Longueur_Mixte;
+
+    //const id_orientation = req.body.id_orientation;
+    const Type_SurfaceExterne = req.body.Type_SurfaceExterne;
+    const Materiaux_SurfaceExterne = req.body.Materiaux_SurfaceExterne;
+    const Epaisseur_SurfaceExterne = req.body.Epaisseur_SurfaceExterne;
+    const Type_SurfaceInterne=req.body.Type_SurfaceInterne;
+
+    const Materiaux_SurfaceInterne = req.body.Materiaux_SurfaceInterne;
+    const Epaisseur_SurfaceInterne = req.body.Epaisseur_SurfaceInterne;
+    const Isolant_Materiaux = req.body.Isolant_Materiaux;
+    const Isolant_Epaisseur=req.body.Isolant_Epaisseur;
+
+
+   
+    const sqlInsert ="INSERT INTO plafond(longueur,contact_externe,AutreLocal_Mixte,Longueur_Mixte) VALUES(?,?,?,?)";
+    db.query(sqlInsert, [longueur,contact_externe,AutreLocal_Mixte,Longueur_Mixte],(err, res) => {
+        console.log(err);
+        
+});
+const sqlInsert1 ="INSERT INTO composition(Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur) VALUES(?,?,?,?,?,?,?,?)";
+    db.query(sqlInsert1,[Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur],(err, res) => {
         console.log(err);
 });
 });
+//ajouter plancher
+app.post("/InsertPlancher" , (req, res) => { 
+    const contact_externe = req.body.contact_externe;
+    const vide_sanitaire= req.body.vide_sanitaire;
+    const epaisseur=req.body.epaisseur
+    
+
+    //const id_orientation = req.body.id_orientation;
+    const Type_SurfaceExterne = req.body.Type_SurfaceExterne;
+    const Materiaux_SurfaceExterne = req.body.Materiaux_SurfaceExterne;
+    const Epaisseur_SurfaceExterne = req.body.Epaisseur_SurfaceExterne;
+    const Type_SurfaceInterne=req.body.Type_SurfaceInterne;
+
+    const Materiaux_SurfaceInterne = req.body.Materiaux_SurfaceInterne;
+    const Epaisseur_SurfaceInterne = req.body.Epaisseur_SurfaceInterne;
+    const Isolant_Materiaux = req.body.Isolant_Materiaux;
+    const Isolant_Epaisseur=req.body.Isolant_Epaisseur;
+
+
+   
+    const sqlInsert ="INSERT INTO plancher(contact_externe,vide_sanitaire,epaisseur) VALUES(?,?,?)";
+    db.query(sqlInsert, [contact_externe,vide_sanitaire,epaisseur],(err, res) => {
+        console.log(err);
+        
+});
+const sqlInsert1 ="INSERT INTO composition(Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur) VALUES(?,?,?,?,?,?,?,?)";
+    db.query(sqlInsert1,[Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur],(err, res) => {
+        console.log(err);
+});
+});
+//ajouter porte
+app.post("/InsertPorte" , (req, res) => { 
+    const orientation=req.body.orientation;
+    const Type_ouverture = req.body.Type_ouverture;
+    const Isolation= req.body.Isolation;
+    const contact_externe=req.body.contact_externe;
+    const AutreLocal_Mixte= req.body.AutreLocal_Mixte;
+    
+    const DimensionNormalise= req.body.DimensionNormalise;
+
+    
+
+    const largeur =req.body.largeur;
+    const hauteur =req.body.hauteur;
+
+
+    
+
+    //const id_orientation = req.body.id_orientation;
+    const Type_SurfaceExterne = req.body.Type_SurfaceExterne;
+    const Materiaux_SurfaceExterne = req.body.Materiaux_SurfaceExterne;
+    const Epaisseur_SurfaceExterne = req.body.Epaisseur_SurfaceExterne;
+    const Type_SurfaceInterne=req.body.Type_SurfaceInterne;
+
+    const Materiaux_SurfaceInterne = req.body.Materiaux_SurfaceInterne;
+    const Epaisseur_SurfaceInterne = req.body.Epaisseur_SurfaceInterne;
+    const Isolant_Materiaux = req.body.Isolant_Materiaux;
+    const Isolant_Epaisseur=req.body.Isolant_Epaisseur;
+
+
+   
+    const sqlInsert ="INSERT INTO porte(orientation,Type_ouverture,Isolation,contact_externe,AutreLocal_Mixte,DimensionNormalise,largeur,hauteur) VALUES(?,?,?,?,?,?,?,?)";
+    db.query(sqlInsert, [orientation,Type_ouverture,Isolation,contact_externe,AutreLocal_Mixte,DimensionNormalise,largeur,hauteur],(err, res) => {
+        console.log(err);
+        
+});
+const sqlInsert1 ="INSERT INTO composition(Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur) VALUES(?,?,?,?,?,?,?,?)";
+    db.query(sqlInsert1,[Type_SurfaceExterne,Materiaux_SurfaceExterne,Epaisseur_SurfaceExterne,Type_SurfaceInterne,Materiaux_SurfaceInterne,Epaisseur_SurfaceInterne,Isolant_Materiaux,Isolant_Epaisseur],(err, res) => {
+        console.log(err);
+});
+});
+
 
 app.put("/updateProjet/:id",(req,res)=>{
      
@@ -455,6 +684,13 @@ app.get("/getclient/:id", (req, res) => {
       
     });
 });
+app.get("/getclientD/:id", (req, res) => {
+    let sql = 'SELECT nom,prenom,mail,code_postal,ville,pays,telephone FROM client WHERE id= '+req.params.id;
+    let query = db.query(sql, (err,results) => {
+        res.send(results);
+       
+    });
+});
 // select Type 
 app.get('/gettype' , (req, res) => {
     let sql = 'SELECT libelle_type FROM type';
@@ -463,6 +699,7 @@ app.get('/gettype' , (req, res) => {
        
     });
 });
+
 // select ville
 app.get('/getville' , (req, res) => {
     let sql = 'SELECT * FROM ville ';
@@ -494,7 +731,15 @@ app.post ('/InsertVille',(req, res)=>{
 });
 // select construction
 app.get('/getconstruction' , (req, res) => {
-    let sql = 'SELECT libelle_construction FROM construction ';
+    let sql = 'SELECT libelle FROM construction ';
+    let query = db.query(sql, (err,results) => {
+        res.send(results);
+       
+    });
+});
+// select construction
+app.get('/materiau_isolant' , (req, res) => {
+    let sql = 'SELECT nomisolant FROM materiaux_isolant ';
     let query = db.query(sql, (err,results) => {
         res.send(results);
        
@@ -502,7 +747,7 @@ app.get('/getconstruction' , (req, res) => {
 });
 // select construction
 app.get('/getmetaux' , (req, res) => {
-    let sql = 'SELECT libelle_metaux FROM metaux ';
+    let sql = 'SELECT libelle FROM metaux ';
     let query = db.query(sql, (err,results) => {
         res.send(results);
        
@@ -520,7 +765,6 @@ app.get('/getsurface',(req,res) => {
 
        
        
-
     });
    
    
@@ -543,13 +787,7 @@ app.get('/getTempInterne',(req,res)=>{
     });
 });
 
-app.get("/getclientD/:id", (req, res) => {
-    let sql = 'SELECT nom,prenom,mail,code_postal,ville,pays,telephone FROM client WHERE id= '+req.params.id;
-    let query = db.query(sql, (err,results) => {
-        res.send(results);
-       
-    });
-});
+
 
 app.listen('4000',() => {
     console.log('Server started on port 4000');

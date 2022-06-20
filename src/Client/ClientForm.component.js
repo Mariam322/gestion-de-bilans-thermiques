@@ -9,6 +9,8 @@ import  {
 import Logo from "../assets/lOGO.JPG"
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
+import NavAdmin from '../Navbar/Navadmin'
+import NavEmploye from '../Navbar/Nav'
 
 
 
@@ -185,21 +187,22 @@ export default class Client extends Component {
      /*console.log(this.state.selectedRow)*/
      return (
   
-        
+  
        
         <div>
-             
-             <h1> Gestion client </h1>
-             <div>
-        <img src={Logo} alt="profile" className="logocli"/>
-        </div>
+                  {
+            sessionStorage.getItem('isAdmin') === '1' ?  <NavAdmin/>: <NavEmploye/>
+          }
+      
+             <h1  style={{  marginTop: '120px'}}> Gestion client </h1>
+        
              <SearchPanel  visible={true}  />
             
              <DataGrid rows={rows} columns={columns}   allowColumnReordering={true}
    style={{height:400,
         justifyContent: 'space-between',
         display: 'flex',
-        marginTop: '70px',
+        marginTop: '30px',
         }} checkboxSelection 
       
          onSelectionModelChange={(ids) => {
@@ -285,7 +288,7 @@ export default class Client extends Component {
         </div>
         <div className="newUserItem">
           <label>Telephone :</label>
-          <input type="tel" value={this.state.telephone} onChange={this.handleChange}  name="telephone" placeholder="+216 ******"  required/>
+          <input type="tel" value={this.state.telephone} onChange={this.handleChange}  name="telephone" pattern="[0-9]{2}[0-9]{3}[0-9]{3}" placeholder="+216 ******"  required/>
         </div>
         <div className="newUserItem">
         <label>Fax :</label>

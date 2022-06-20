@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+
 import  { useState } from "react";
 import Axios from 'axios';
 import '../ForgetPassword/forget.css'
@@ -13,37 +13,43 @@ export default function ForgetPasswordPage() {
     const ForgotPassword = () => {
         Axios.post("http://localhost:4000/forgot",{
             mail:mail
-        }).then((msg) => {
-            console.log(msg);
-            if (msg == 'Incorrect Username and/or Password!'){
-                //alert('Incorrect Username and/or Password!');
-                Swal.fire({
-                 
-                text: 'Incorrect Username and/or Password!',
-                icon: 'warning',
-                
-                confirmButtonColor: 'black',
-               
-                confirmButtonText: 'OK'
-                })
-                
-              }else{
-               if(msg == 'Please enter Username and Password!'){
+        }).then((response) => {
+            console.log(response);
+    
+            if(response.data.message == 'Le lien de réinitialisation du mot de passe a été envoyé à votre adresse e-mail'){
                 // alert('Please enter Username and Password!')
                    Swal.fire({
   
-text: 'Please enter Username and Password!',
+text: 'Le lien de réinitialisation du mot de passe a été envoyé à votre adresse e-mail',
+icon: 'success',
+
+confirmButtonColor: 'black',
+
+confirmButtonText: 'OK'
+})
+return
+               }
+              
+              
+
+              
+              
+
+               if(response.data.message == 'Impossible de trouver un compte correspondant à cette adresse e-mail'){
+                // alert('Please enter Username and Password!')
+                   Swal.fire({
+  
+text: 'Impossible de trouver un compte correspondant à cette adresse e-mail',
 icon: 'warning',
 
 confirmButtonColor: 'black',
 
 confirmButtonText: 'OK'
 })
+return
                }
-               else{
-                history.push('/Account')
-               }
-              }
+              
+              
 
               
               
@@ -74,11 +80,10 @@ confirmButtonText: 'OK'
                </div>
                  
                 <p>
-                    <button id="sub_btn"onClick={ForgotPassword} type="submit">Envoyer un e-mail de réinitialisation du mot de passe</button>
+     <button id="sub_btn"onClick={ForgotPassword} type="submit">Envoyer un e-mail de réinitialisation du mot de passe</button>
                 </p>
                 <br/>
                 <footer>
-                <p>Première fois?  <Link to="/signIn">Créer compte</Link>.</p>
                
             </footer>
             </div>

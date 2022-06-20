@@ -14,3 +14,14 @@
     position: absolute;
     padding: 14px 0 0 25px;
 }
+.logoRM {
+  height: 130px;
+  width: 100px;
+  border-radius: 15px;
+ 
+  margin-left:-80px;
+  margin-bottom: 7%;
+  
+  border-radius: 15px;
+  margin-top: -120px;;
+} 

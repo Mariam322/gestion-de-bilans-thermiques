@@ -9,6 +9,8 @@ import  {
 import '../Ville/ville.css';
 import Swal from 'sweetalert2';
 import ville from '../assets/map.PNG'
+import NavAdmin from '../Navbar/Navadmin'
+import NavEmploye from '../Navbar/Nav'
 export default class Ville extends Component {
 
     constructor(props) {
@@ -128,11 +130,14 @@ export default class Ville extends Component {
              /*console.log(this.state.selectedRow)*/
              return (
           
-                
-               
+                <div>
+                 {
+            sessionStorage.getItem('isAdmin') === '1' ?  <NavAdmin/>: <NavEmploye/>
+          }
+      
                 <div>
                     
-                     <h1> Caractéristiques de la Chambre froide</h1>
+                     <h1>Liste des villes</h1>
                      <SearchPanel  visible={true}  />
                     
                      <DataGrid rows={rows} 
@@ -185,7 +190,7 @@ export default class Ville extends Component {
                  <div className="newUser">
      
      
-     <form className="newUserForm">
+     <form className="newUserForm" style={{marginTop:'-150px'}}>
         
     
        <div className="newUserItem">
@@ -214,6 +219,7 @@ export default class Ville extends Component {
        
        </form>
 
+</div>
 </div>
             <button  type="submit" onClick={this.Addville} className="newUserButton">Ajouter</button>
           <a href="/Project-list"><button  type="button"  className="newUserButton">Retour  </button></a>

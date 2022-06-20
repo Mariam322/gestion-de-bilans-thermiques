@@ -5,11 +5,12 @@ import API from '../Api/Api';
 import Select from 'react-select'
 import Logo from "../assets/lOGO.JPG"
 import AddDeleteTableRow from'./addDeleteTableRow'
-import Popup from "reactjs-popup";
+import jsPDF from 'jspdf';
+
 import argent from "../assets/argent.png"
 import { Link } from 'react-router-dom';
 import prix from "../assets/prix.PNG"
-import jsPDF from 'jspdf';
+import { Summarize } from '@mui/icons-material';
 
 
 export default class Deviss extends Component {
@@ -27,6 +28,10 @@ export default class Deviss extends Component {
         fax :'', 
         mail :'', 
         TypeChambre:'',
+        TVA:'',
+        
+        
+        
       
     
     
@@ -100,32 +105,59 @@ date:date
               handleChange =(e) =>
               {let nam = e.target.name;
                let val = e.target.value;
-         
+               sessionStorage.setItem('quantite',e.target.value);
                  this.setState({[nam]: val});
               }
-            
-  pdfDownload = e => {
-    e.preventDefault()
-    let doc = new jsPDF("landscape", 'pt', 'A2');
-    doc.html(document.getElementById('pdf-view'), {
-      callback: () => {
-        doc.save('Devis.pdf');
-      }
-    });
-}
-  
-    render(){
+              pdfDownload = e => {
+                e.preventDefault()
+                let doc = new jsPDF("landscape", 'pt', 'A2');
+                doc.html(document.getElementById('pdf-view'), {
+                  callback: () => {
+                    doc.save('Devis.pdf');
+                  }
+                });
+            }
+            handleChange_third = (e) =>  
 
+            {
+             
+              sessionStorage.setItem('TVA',e.value);
+              console.log('TVA',this.state.TVA);            
+              };
+              handelChange_TAXE =(e) =>{
+                this.setState({TAXE:''})
+                this.setState({
+                  TAXE:(sessionStorage.getItem('Type')*sessionStorage.getItem('Surface')*sessionStorage.getItem('TVA')/100)
+                });
+                sessionStorage.setItem('TAXE',(sessionStorage.getItem('Type')*sessionStorage.getItem('Surface')*sessionStorage.getItem('TVA')/100));
+              }
+              handelChange_TOTALE =(e) =>{
+                this.setState({TOTALE:''})
+                this.setState({
+                  TOTALE:(parseInt((Number(sessionStorage.getItem('Type')))*Number(sessionStorage.getItem('Surface')))*(Number(sessionStorage.getItem('quantite')))+(Number(sessionStorage.getItem('TAXE'))))
+                });
+               
+              }
+
+
+
+              
+            
+    render(){
+      const TVA = [
+        { value: 6, label: '6%' },
+        { value: 12, label: '12%' },
+        { value: 18, label: '18%' },
+        { value: 20, label: '20%' },
+       
+        
+      ]
   
           
     return (
-      <div className="App container mt-5">
-     
-     <div id="pdf-view">
-     
-    
-      
-        <div >
+        
+      <div>
+        <div id="pdf-view" >
             <div >
             <h1 className='devis'>Devis</h1>
             
@@ -209,7 +241,7 @@ date:date
            value={this.state.dateV}  
          
            disabled={true}
-          type="date"//a corriger 
+          
            name="date"
           />
 
@@ -242,55 +274,43 @@ date:date
           
           <div>
                      
-                     <Popup trigger={<Link to ={'/Deviss'}><img src={argent} alt="argent" className="argent"/></Link>} position="top left">
-      {close => (
-        <div>
-          <img src={prix} alt="prix" className="prix"/>
-          Fermer ici
-          <a className="close" onClick={close}>
-            &times;
-          </a>
-        </div>
-      )}
-    </Popup>
                      </div>
        <AddDeleteTableRow/>
    </div> <br></br>
        
 </div>
 <div className="Total"> 
-<div>
-  <label>TOTAL: </label>
-  <input  type="text" value ={sessionStorage.getItem('Surface')*sessionStorage.getItem('Type') }></input>
+<div className="newUserItem">
+  <label>SOUS-TOTAL :</label>
+  <input type="text"  value={sessionStorage.getItem('Surface')*sessionStorage.getItem('Type')*sessionStorage.getItem('quantite') } ></input>
   </div><br></br>
-  <div> 
-  <label>T.V.A: </label>
-  <input type="text" ></input>
+  <div className="newUserItem"> 
+  <label>T.V.A. :</label>
+  <Select  options= {TVA} onChange={this.handleChange_third.bind(this)}
+
+selected={sessionStorage.getItem('TVA')}
+  ></Select>
   </div><br></br>
-  <div> 
-  <label>TAXE: </label>
-  <input type="text"></input>
+  <div className="newUserItem"> 
+  <label>TAXE:</label>
+  <input type="text" value={this.state.TAXE} onChange={this.handelChange_TAXE}   ></input>
   </div><br></br>
-  <div> 
-  <label>AUTRE :</label>
-  <input type="text"></input>
+  <div className="newUserItem"> 
+  <label>AUTRE:</label>
+  <input type="number" value={0.300}></input>
   </div><br></br>
 
-  <div> 
+  <div className="newUserItem"> 
   <label>TOTAL:</label>
-  <input type="text"></input>
+  <input type="text" value={this.state.TOTALE} onChange={this.handelChange_TOTALE}></input>
   </div><br></br>
 
   </div>
   
-
-      
+  <button  className="newUserButton" onClick={this.pdfDownload}>Télécharger en pdf</button>
+        <button  type="button"  className="newUserButton">Retour  </button>
             </div>
-            <button  className="newUserButton" onClick={this.pdfDownload}>Télécharger en pdf</button>
-            <button  type="button"  className="newUserButton">Retour  </button>
-          
-
-       </div>
+        
        
         );  
         

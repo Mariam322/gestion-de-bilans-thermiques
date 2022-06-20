@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import API from '../Api/Api';
-import Nav from '../Navbar/Nav'
-
+import NavAdmin from '../Navbar/Navadmin'
+import NavEmploye from '../Navbar/Nav'
 export default class Profil extends Component {
 
   constructor(props) {
@@ -19,23 +19,27 @@ export default class Profil extends Component {
         login :'', 
         mail :'', 
         motdepass :'', 
-
+        id:'',
+   
 
         redirect: null,
         
         
         };
         
-
-     
-        
     }
     componentDidMount=() =>{
       const id = sessionStorage.getItem('userId');
       console.log('id', id)
       this.GetOne(id);
+      
+      
      
       }
+      componentDidUpdate=()=>{
+        const id = sessionStorage.getItem('userId');
+        this.EditProfil(id);
+    }
       GetOne = async (id) => {
         await API.get('/getuser/'+id)
         .then(response => { 
@@ -57,6 +61,38 @@ export default class Profil extends Component {
                console.log(error);
                })
                }
+         
+                       handleChange_first =(e) =>
+                       {let nam = e.target.name;
+                        let val = e.target.value;
+     
+                          this.setState({[nam]: val}); 
+                         
+                          
+                     }
+           
+               EditProfil=(id)=>{
+                console.log('hello',id);
+                let ProfilObject = {
+          
+                nom: this.state.nom,
+               prenom : this.state.prenom,
+               sexe : this.state.sexe,
+               Route  : this.state.Route , 
+               ville  :this.state.ville , 
+               code_postal  :this.state.code_postal , 
+               telephone  :this.state.telephone , 
+               login  :this.state.login , 
+               mail   :this.state.mail  , 
+               motdepass    :this.state.motdepass   , 
+                
+
+                };
+                console.log(id)
+                API.put('/updateuser/'+ id, ProfilObject )
+                .then(res => console.log(res.data));
+                
+               }
      
     
 
@@ -67,18 +103,21 @@ export default class Profil extends Component {
     return(
      
       <div>
-         <Nav/>
+           {
+            sessionStorage.getItem('isAdmin') === '1' ?  <NavAdmin/>: <NavEmploye/>
+          }
       
       <div>
       <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
       </div>
         <div className="newUser">
        
-        <h1 className="newUserTitle">Formulaire utilisateur</h1>
-        <form className="newUserForm">
-           
+        <h1 className="newUserTitle" style={{marginTop:'-70px'}}>Profil</h1>
+       
+        <form className="newUserForm"style={{marginTop:'0px'}}>
+     
       
-          <div className="newUserItem">
+          <div className="newUserItem" >
             <label>Nom :</label>
             <input type="text" placeholder="Nom" 
             name="nom" value ={this.state.nom} required />
@@ -102,7 +141,7 @@ export default class Profil extends Component {
         </div>
    
         
-          <div className="newUserItem">
+          <div className="newUserItem" >
           <label>Route :</label>
             <input type="text"   name="Route" placeholder="Route" defaultValue ={this.state.Route} required />
           </div>
@@ -112,13 +151,13 @@ export default class Profil extends Component {
           </div>
           <div className="newUserItem">
             <label>Code postal :</label>
-            <input type="text"  name="code_postal" placeholder="code postal"value ={this.state.code_postal}  required/>
+            <input type="text"  name="code_postal" placeholder="code postal" value ={this.state.code_postal}  onChange={this.handleChange_first}  pattern="[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}"  required/>
           </div>
           <div className="newUserItem">
             <label>Téléphone :</label>
-            <input type="tel"   name="telephone" placeholder="+216 **"  defaultValue ={this.state.telephone} required/>
+            <input type="text"   name="telephone" placeholder="+216 **" pattern="[0-9]{2}[0-9]{3}[0-9]{3}" onChange={this.handleChange_first} value ={this.state.telephone} required/>
           </div>
-          <div className="newUserItem">
+          <div className="newUserItem" >
           <label>Login :</label>
             <input type="text"    name="login" placeholder="login" value ={this.state.login} required />
           </div>
@@ -126,15 +165,15 @@ export default class Profil extends Component {
    
           <div className="newUserItem">
             <label>E-mail :</label>
-            <input type="email"  name="mail" placeholder="___@.__"   value ={this.state.mail} required/>
+            <input type="email"  name="mail" placeholder="___@.__"  onChange={this.handleChange_first}  value ={this.state.mail} required/>
           </div>
           <div className="newUserItem">
             <label>Mot de passe :</label>
-            <input type="text"  name="motdepass" placeholder="mot de passe" value ={this.state.motdepass}  required/>
+            <input type="text"  name="motdepass" placeholder="mot de passe" value ={this.state.motdepass}  onChange={this.handleChange_first}  required/>
           </div>
        
-         
-        
+         <br></br><br></br>
+        <button type="submit" className="newUserButton" onClick={this.EditProfil} style={{ marginLeft:'5px'}}>Modifier</button>
         </form>
       </div>
       </div>

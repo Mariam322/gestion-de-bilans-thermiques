@@ -12,7 +12,7 @@ import { Redirect } from 'react-router';
 import client from"../Client/ClientForm.component";
 
 import { Route } from 'devextreme-react/map';
-import { useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";//navigation
 
 
 
@@ -24,57 +24,78 @@ function Login() {
 
   
     const fnlogin =()=>{
-        
-        Axios.post("http://localhost:4000/loogin" ,{
-            login: login,
+      
+      Axios.post("http://localhost:4000/loogin" ,{
+        login: login,
             motdepass: motdepass,
             roles:'',
+            Etat:'',
+            
           })
           .then ((response) => {
-             
-              console.log(response);
-              console.log(response.data)
+            
+            console.log(response);
+            console.log(response.data)
+            if(response.data[0]){
+
               sessionStorage.setItem('userId',response.data[0].id);
-              if (response.data == 'Incorrect Username and/or Password!'){
+              if (response.data[0].roles=='Admin'){
+                    history.push('/Account_Admin')
+                    sessionStorage.setItem('isAdmin','1')
+                    return
+                  }
+                  sessionStorage.setItem('isAdmin','0')
+                  if (response.data[0].roles=='Employee'){
+                    history.push('/Account_User')
+                    return
+                  }
+            }
+              
+              if (response.data == 'login et/ou mot de passe incorrect!'){
                 //alert('Incorrect Username and/or Password!');
                 Swal.fire({
-                 
-                text: 'Incorrect Username and/or Password!',
-                icon: 'warning',
-                
-                confirmButtonColor: 'black',
-               
-                confirmButtonText: 'OK'
+                  
+                  text: 'login et/ou mot de passe incorrect!',
+                  icon: 'warning',
+                  
+                  confirmButtonColor: 'black',
+                  
+                  confirmButtonText: 'OK'
                 })
-                
-              }else{
-               if(response.data == 'Please enter Username and Password!'){
-                // alert('Please enter Username and Password!')
-                   Swal.fire({
-  
-text: 'Please enter Username and Password!',
-icon: 'warning',
-
-confirmButtonColor: 'black',
-
-confirmButtonText: 'OK'
-})
-               }
-               else if (response.data[0].roles=='Admin'){
-                history.push('/Account_Admin')
-               }
-               else if (response.data[0].roles=='Empolye'){
-                history.push('/Account_User')
-               }
+                return
               }
-
+              if (response.data.message === 'Votre compte a été désactivé !'){
+                Swal.fire({
+                  
+                  text: 'Votre compte a été désactivé !',
+                  icon: 'error',
+                  
+                  confirmButtonColor: 'black',
+                  
+                  confirmButtonText: 'OK'
+                })
+                return }
+              if(response.data == 'Veuillez entrer votre login et votre  mot de passe!'){
+                // alert('Please enter Username and Password!')
+                Swal.fire({
+                  
+                  text: 'Veuillez entrer votre login et votre  mot de passe!',
+                  icon: 'warning',
+                  
+                  confirmButtonColor: 'black',
+                  
+                  confirmButtonText: 'OK'
+                })
+                return 
+              }
+                
+                
               
               
+              
+            }
+            )};
             
-          
-          }
-          )};
-   
 
     return (
   
@@ -113,7 +134,7 @@ confirmButtonText: 'OK'
              </div>
              
             <div className="login-button">
-            <button className="button"   onClick={fnlogin}>Login</button>
+          <button className="button"  type="submit" onClick={fnlogin}>Login</button>
             </div> <br/> 
              
               <p className="link">

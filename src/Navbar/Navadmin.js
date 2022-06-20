@@ -1,36 +1,38 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import '../Navbar/Nav.css'
-import API from '../Api/Api';
+import Axios from 'axios';
 import  lOGO from "../assets/lOGO.JPG";
 import styled from "styled-components";
 import user from '../assets/user2.png'
 import logOut from "../assets/Lougout.png";
-import Axios from 'axios';
-import { get } from "jquery";
-const NavEmploye = () => {
+const NavAdmin = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [nom, setnom] = useState("");
   const [prenom, setprenom] = useState("");
-  
   const id = sessionStorage.getItem('userId');
-  Axios.get("http://localhost:4000/getnomuser/" +id , {
-    nom: nom,
-    prenom:prenom
-  }).then ((response) => {
-    
-    localStorage.setItem('nomUser',response.data[0].nom);
-    localStorage.setItem('prenomuser',response.data[0].prenom) ; // nom=response.data[0].nom;
-    
-    setnom(response.data[0].nom)
-    setprenom(response.data[0].prenom)
+  function getNom(id) {
+    Axios.get("http://localhost:4000/getnomuser/" +id , {
+      nom: nom,
+      prenom:prenom
+    }).then ((response) => {
+     
+      setnom(response.data[0].nom)
+      setprenom(response.data[0].prenom)
+  
 
       console.log(response.data[0].nom);
       console.log(response.data[0].prenom)
+      
+     localStorage.setItem('nomUser',response.data[0].nom);
+    localStorage.setItem('prenomuser',response.data[0].prenom) ; // nom=response.data[0].nom;
     })
+  
+ 
+  }
   
   return (
     <Nav className="navb">
-    <Logo href="">
+    <Logo href=""> 
     <img src={lOGO} alt="lOGO" className="logoF"/>
       <p style={{marginLeft:"75px",marginTop:"-60px"}}> Froid<span>industriel </span> </p>
     </Logo>
@@ -40,18 +42,36 @@ const NavEmploye = () => {
       <span />
     </Hamburger>
     <Menu isOpen={isOpen}>
-      <MenuLink href="/Account_User">Accueil</MenuLink>
-      <MenuLink href="/Project-list">Projets</MenuLink>
-     
+      <MenuLink href="/Account_Admin">Accueil</MenuLink>
+      <div className="dropdown">
+      <MenuLink className="dropbtn" style={{color:' #67bc98'}} href="/Project-list">Projets</MenuLink>
+      <i className="fa fa-caret-down"></i>
+      <div className="dropdown-content">
+      <a href="/Mur_1"> Mur 1</a>
+      <a href="/Mur_2">Mur 2</a>
+      <a href="/Mur_3">Mur 3</a>
+      <a href="/Mur_4">Mur 4</a>
+      <a href="/plancher">Plancher</a>
+      <a href="/Plafond">Plafond</a>
+      <a href="/porte">Porte</a>
+
+      
+
+      
+
+    </div>
+      </div>
+      <MenuLink href="/User-list">Utilisateurs</MenuLink>
       <MenuLink href="/Client">Clients</MenuLink>
       </Menu>
       <div class="navbar">
  
-  <div class="dropdown">
-    <button class="dropbtn" > <input className='User' value={nom+ ' ' +prenom}  readonly ></input>
-      <i class="fa fa-caret-down"></i>
+  <div className="dropdown">
+    <button className="dropbtn" onClick={getNom(id)} type="button"> 
+    <input /* onChange={(e)=>{ setnom(e.target.value);}} */ className='User' value={nom+ ' ' +prenom}  readonly ></input> 
+      <i className="fa fa-caret-down"></i>
     </button>
-    <div class="dropdown-content">
+    <div className="dropdown-content">
       <a href="/Profil"> <img src={user} alt={user} style={{width:"20px",marginTop:"-2px",justifycontent: "space-between"}} className="user"></img>Profil</a>
       <a href="/"><img src={logOut} alt={logOut} style={{width:"20px",marginTop:"-4px",justifycontent: "space-between"}} className="logout"/>Déconnecter</a>
 
@@ -62,7 +82,7 @@ const NavEmploye = () => {
   );
 };
 
-export default NavEmploye;
+export default NavAdmin;
 
 const MenuLink = styled.a`
   padding: 1rem 2rem;

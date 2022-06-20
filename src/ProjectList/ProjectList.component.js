@@ -6,7 +6,8 @@ import '../ProjectList/projlist.css';
 import  {
     SearchPanel
 } from 'devextreme-react/data-grid';
-import Nav from '../Navbar/Nav'
+import NavAdmin from '../Navbar/Navadmin'
+import NavEmploye from '../Navbar/Nav'
 import Select from 'react-select';
 import { Link } from 'react-router-dom';
 import information from '../assets/information.PNG'
@@ -31,10 +32,11 @@ export default class Project extends Component {
         prenom:'',
         mail:'',
         code_client:'',
+       
         Hauteur:'',
         Epaisseur:'',
         standard :'',
-       
+       id_user:sessionStorage.getItem("userId"),
     
         clientiditem:'',
 
@@ -79,15 +81,19 @@ export default class Project extends Component {
     //componentDidMount() est appelée immédiatement après que le composant est monté (inséré dans l’arbre).
     componentDidMount=async() =>{
     this.GetData();
+    console.log('mn');
     this.getOptions();
     }
     componentDidUpdate=()=>{
-        this.GetData()
+      console.log('up');
+
+        //this.GetData()
     }
     componentDidMount_1=() =>{
         const { id } = this.props.match.params;
         this.GetOne(id);
        console.log(id);
+
         }
      
         GetOne = async (id) => {
@@ -137,18 +143,27 @@ export default class Project extends Component {
         AddProjet=()=>{ 
             const ProjetObject = {
               code_client:this.state.code_client,
+            
               nom_projet: this.state.nom_projet,
               Date_de_création: this.state.Date_de_création,
               Date_limite: this.state.Date_limite,
               standard : this.state.standard ==='Non' ? 0 : 1,
               Epaisseur : this.state.Epaisseur,
               Hauteur : this.state.Hauteur,
+              id_user : this.state.id_user,
 
 
         }; 
-      
-            API.post('/InsertProjet',ProjetObject )
-            .then(res => console.log(res.data));
+        
+        console.log("AAAAAAA"+sessionStorage.getItem('userId'));
+        ProjetObject.id_user = sessionStorage.getItem('userId')
+        console.log(ProjetObject)
+        API.post('/InsertProjet',ProjetObject )
+            .then(res => {console.log(res.data)
+              sessionStorage.setItem('id_project',res.data.id_project);
+            
+            }
+            );
            
            }
            
@@ -196,9 +211,18 @@ export default class Project extends Component {
                    let val = e.target.value;
 
                      this.setState({[nam]: val}); 
-                     sessionStorage.setItem('Epaisseur',this.state.Epaisseur);
+                   
                      
                 }
+                handleChange_epaisseur=(e)=>{
+                  let nam = e.target.name;
+                   let val = e.target.value;
+
+                     this.setState({[nam]: val}); 
+                   
+                  sessionStorage.setItem('Epaisseur',this.state.Epaisseur);
+                }
+                
 
                 
                    handleChange_first = (e) => {
@@ -254,17 +278,21 @@ export default class Project extends Component {
    
      ]; 
      console.log(this.state.selectedRow)
-    
+     console.log(typeof sessionStorage.getItem('isAdmin'))
+
      return (
          
         
        
         <div>
-          
+          {
+            sessionStorage.getItem('isAdmin') === '1' ?  <NavAdmin/>: <NavEmploye/>
+          }
+      
            
-             <h1 > Gestion projets </h1>
+             
              <SearchPanel  visible={true}  />
-            
+             <h1 style={{  marginTop: '120px'}}> Gestion projets </h1>
              <DataGrid rows={rows} columns={columns}   allowColumnReordering={true}
    style={{height:400,
         justifyContent: 'space-between',
@@ -325,6 +353,13 @@ export default class Project extends Component {
     
 
       <form className="newProjectForm">
+
+      <div className="newProjectItem">
+          <label>Identifant utilisateur:</label>
+          <input type="text" placeholder="Identifant utilisateur" value={sessionStorage.getItem('userId')}
+          name="id_user" />
+        </div>
+    
       <div className="newProjectItem">
           <label>Date de création :</label>
           <input type="text"
@@ -343,7 +378,7 @@ export default class Project extends Component {
 
         <div className="newProjectItem">
           <label>Hauteur de la chambre:</label>
-          <input type="text" placeholder="Hauteur" value={sessionStorage.setItem('Hauteur',this.state.Hauteur) } onChange={this.handleChange} 
+          <input type="number" min="0.5" placeholder="Hauteur" DefaultValue={sessionStorage.setItem('Hauteur',this.state.Hauteur) } value={this.state.Hauteur} onChange={this.handleChange} 
           name="Hauteur"   required />
         </div>
     
@@ -369,25 +404,25 @@ export default class Project extends Component {
           <input type="text" placeholder="prenom"  value={this.state.prenom} onChange={this.handleChange_First} 
           name="prenom"    disabled={true}  required />
         </div>
-        <div className="newProjectItem">
+        <div className="newProjectItem" style={{marginTop:'-30px'}}>
           <label>Mail Client:</label>
           <input type="text" placeholder="mail"  value={this.state.mail} onChange={this.handleChange_First} 
           name="mail" disabled={true} required />
         </div>
         <br/> <br/>
-        <fieldset style={{ width:"400%"}}>
+        <fieldset style={{ width:"400%",marginTop:'20px'}}>
             <legend>Panneaux sandwich : </legend>
              
                 <div className="newUserItem">
                     <label>Standard :</label>
                     <Select defaultValue={sessionStorage.getItem('disbaleMur1')==='OUI'? standard[1]:standard[0]}  options={standard}  onChange={this.handleChange_first.bind(this)}/>
                 </div>
-                <div className="newUserItemED">
+                <div className="newUserItem" style={{marginTop:'-55px',marginLeft:'420px'}}>
                      <label>Epaisseur (mm) :</label> 
        
         
-                     <input type="number" min="1" max="100" placeholder="Epaisseur" disabled={sessionStorage.getItem('disbaleMur1')!=='OUI'}  onChange={this.handleChange} 
-                     name="Epaisseur" value={sessionStorage.getItem('Epaisseur')}/> 
+                     <input type="number" min="1"  placeholder="Epaisseur" disabled={sessionStorage.getItem('disbaleMur1')!=='OUI'}  onChange={this.handleChange_epaisseur} 
+                     name="Epaisseur"  DefaultValue={sessionStorage.getItem('Epaisseur')} value={this.state.Epaisseur}/> 
                    
                    
                    <div>
@@ -410,9 +445,9 @@ export default class Project extends Component {
                 
            </fieldset >
           
-        <button  type="submit" onClick={this.AddProjet} className="newProjectButton">Ajouter</button>
+    
         <button  type="submit" onClick={this.EditProjet} className="newProjectButton">Modifier</button>
-        <Link to={"/ville/"}> <button  type="submit"  className="newProjectButton">Suivant</button></Link>
+        <Link to={"/ville/"}> <button  type="submit" onClick={this.AddProjet}  className="newProjectButton">Suivant</button></Link>
       </form>
     </div>
     </fieldset>

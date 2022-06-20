@@ -27,6 +27,7 @@ import ResumeChambre from'./ResumeChambre/ResumeChambre'
 import Deviss from './Devis/Deviss'
 import Facture from './Facture/Facture'
 import Nav from './Navbar/Nav'
+import Rapport from './Rapport/Rapport';
 
 
 export default function App() {
@@ -56,6 +57,7 @@ export default function App() {
                  <Route path="/Porte" component={ Porte }/>
                  <Route path="/Produit" component={ Produit }/>
                  <Route path="/ResumeChambre" component={ ResumeChambre }/>
+                 <Route path="/Rapport" component={ Rapport }/>
               
 
                  <Route path="/Deviss" component={ Deviss }/>

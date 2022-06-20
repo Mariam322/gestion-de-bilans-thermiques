@@ -6,7 +6,8 @@ import Select from 'react-select';
 import  {
     SearchPanel
 } from 'devextreme-react/data-grid';
-
+import NavAdmin from '../Navbar/Navadmin'
+import NavEmploye from '../Navbar/Nav'
 import Swal from 'sweetalert2';
 export default class Ville extends Component {
 
@@ -28,7 +29,9 @@ export default class Ville extends Component {
         redirect: null,
         product: [],
         tempS: '',
-        TEST:'',        
+        TEST:'',  
+        masse:'',   
+        type_chambre:'',   
         };
         this.state = {
             searchText: ""
@@ -79,6 +82,7 @@ export default class Ville extends Component {
                     let val = e.target.value;
                     this.setState({[nam]: val});
                    sessionStorage.setItem('Point_de_cong',this.state.Point_de_cong);
+                  
                     
                     //this.setState({Temperature:e.value});
                     
@@ -88,6 +92,8 @@ export default class Ville extends Component {
                
                         this.setState({Temperature:this.getOptions()});
                         sessionStorage.setItem('Temperature',e.value);
+                        this.setState({Point_de_cong:sessionStorage.getItem('Point_de_cong')})
+
                    }
             
                    async getOptions(){
@@ -106,22 +112,32 @@ export default class Ville extends Component {
                 
                   }    
                   handleChange_second = (e) => {
-                     
-                    sessionStorage.setItem('Latitude',this.state.Latitude)
-                    if (sessionStorage.getItem('Temperature') > sessionStorage.getItem('Point_de_cong') ) {
+                    let nam = e.target.name;
+                    let val = e.target.value;
+                    this.setState({[nam]: val});
+                    this.setState({type_chambre:''})
+                    console.log('CONGGGGG',sessionStorage.getItem('Point_de_cong'))
+                    this.setState({Point_de_cong:sessionStorage.getItem('Point_de_cong')})
+                    sessionStorage.setItem('type_chambre',this.state.type_chambre);
+                    
+                   
+                    if( (sessionStorage.getItem('Temperature')) > (sessionStorage.getItem('Point_de_cong'))) {
                       
                      
                       this.setState({
-                       Latitude: 'chambre froide négative'
-                    });
+                        
+                        type_chambre:'chambre froide négative'
+                   });
+                   return sessionStorage.setItem('type_chambre',this.state.type_chambre)
                     }else{
                       
                       this.setState({
-                        Latitude: 'chambre froide positive'
+                        type_chambre:'chambre froide positive'
                       })
+                      
                     }
-                    
-                     console.log (this.state.Latitude);
+                    return sessionStorage.setItem('type_chambre',this.state.type_chambre)
+                     console.log (this.state.type_chambre);
                     
                   }
 
@@ -151,20 +167,23 @@ export default class Ville extends Component {
              return (
           
                 
-               
-                <div>
-                    
-                     <h1> Caractéristiques de la Chambre froide</h1>
+               <div>
+               {
+            sessionStorage.getItem('isAdmin') === '1' ?  <NavAdmin/>: <NavEmploye/>
+          }
+                <div style={{marginTop:'120px'}}>
+                   
+                     <h1 style={{marginTop:'0px'}}> Liste des produits</h1>
                      <SearchPanel  visible={true}  />
                     
                      <DataGrid rows={rows} 
                      columns={columns}  
                       allowColumnReordering={true}
            style={{height:300,
-                width: 1350,
+                width: 1400,
                 justifyContent: 'space-between',
                 display: 'flex',
-                marginTop: '20px',
+                marginTop: '60px',
               
                 }} checkboxSelection 
               
@@ -177,7 +196,7 @@ export default class Ville extends Component {
                 );
            
         
-        
+                sessionStorage.setItem('Point_de_cong',selectedRows[0].Point_de_cong)
                 this.setState({selectedRow:selectedRows});
                 this.setState({Denrées:selectedRows[0].Denrées})
                 this.setState({Tcons:selectedRows[0].Tcons}) 
@@ -210,18 +229,27 @@ export default class Ville extends Component {
                  <div className="newUser">
      
      
-     <form className="newUserForm">
+     <form className="newUserForm" style={{marginTop:'-130px'}}>
         
-    
+     <div className="newUserItem">
+         <label>Denrées :</label>
+         <input type="text" placeholder="Denrées" value={this.state.Denrées}  onChange={this.handleChange} 
+         name="Denrées"  required/>
+       </div>
        <div className="newUserItem">
          <label>Point de congelation :</label>
-         <input type="text" placeholder="point de congélation" value={this.state.Point_de_cong}  DefaultValue={sessionStorage.setItem('Point_de_cong',this.state.Point_de_cong)} onChange={this.handleChange} 
+         <input type="text" placeholder="point de congélation" value={sessionStorage.getItem('Point_de_cong')}  onChange={this.handleChange} 
          name="Point_de_cong"  required/>
        </div>
        <div className="newUserItem">
-         <label>Nature de la chambre :</label>
-         <input type="text" placeholder="Nature de la chambre" value={sessionStorage.getItem('Latitude')} onChange={this.handleChange_second}
-        name="Latitude" required  readonly/>
+         <label>Masse à stocker (Tonnes) :</label>
+         <input type="text" placeholder="masse" value={this.state.masse}  onChange={this.handleChange} 
+         name="masse"  required/>
+       </div>
+       <div className="newUserItem" >
+         <label>Type de la chambre :</label>
+         <input type="text" placeholder="type de la chambre" value={sessionStorage.getItem('type_chambre')} onChange={this.handleChange_second.bind(this)}
+        name="type_chambre" required  readonly/>
        </div>
 
        <div className="newUserItem">
@@ -240,9 +268,10 @@ export default class Ville extends Component {
       
        
        </form>
-
+     
 </div>
-            <button  type="submit" onClick={this.Addville} className="newUserButton">Ajouter</button>
+</div>
+       
           <a href="/Project-list"><button  type="button"  className="newUserButton">Retour  </button></a>
            <a href="/Mur_1"><button  type="submit"  className="newUserButton">Suivant  </button></a>
       

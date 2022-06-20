@@ -1,0 +1,118 @@
+.titreR{
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    margin-top: -8%;
+
+}
+.imag{
+    height: 130px;
+    width: 100px;
+    border-radius: 15px;
+}
+
+hr {
+    border: none;
+    border-top: 3px double black;
+    color: #333;
+    overflow: visible;
+    text-align: center;
+    height: 5px;
+    margin-left: 20%;
+    margin-right:20%;
+}
+
+hr:after {
+    background: black;
+    padding: 0 4px;
+    position: relative;
+    top: -13px;
+}
+
+.devisss{
+    border: solid;
+}
+.date{
+    margin-left: 60%;
+    margin-bottom: 150%;
+    margin-top: -24%;
+}
+.paysFax{
+      margin-top: 40%;
+   
+
+}
+.ligne{
+    margin-top: -145%;
+    border: none;
+    border-top: 3px double black;
+    color:black;
+    overflow: visible;
+    text-align: center;
+    height: 5px;
+    margin-left: 5%;
+    margin-right:5%;
+}
+.milieu{
+    margin-left: 30%;
+    margin-top:-2%;
+}
+.extr{
+    margin-left: 55%;
+    margin-top:-2%;
+}
+.inpD{
+    margin-left: 3%;
+}
+.inpN{
+    margin-left: 1%;
+}
+.inpS{
+    margin-left: 5%;
+}
+.inpV{
+    margin-left: 4%;
+}
+.inpT{
+    margin-left: 5%;
+}
+.inpM{
+    margin-left: 3%; 
+}
+.inplar{
+    margin-left:2%;
+}
+.Externe{
+    margin-left:3%;
+}
+.PS{
+    margin-left: 3.5%;
+}
+.milieuP{
+    margin-left: 30%;
+    margin-top:-4%;
+}
+.FF{
+    margin-left: 60px;
+}
+.typeC{
+    margin-left: 38%;
+
+}
+.lig2{
+  
+    border: none;
+    border-top: 3px double black;
+    color:black;
+    overflow: visible;
+    text-align: center;
+    height: 5px;
+   margin-left: 5%;
+    margin-right:5%;
+
+
+}
+.type{
+    margin-left: 40%;
+}
+.imprimer{
+    margin-left: 50%;
+}

@@ -9,6 +9,8 @@ import  {
 
 import '../User/user.css';
 import Select from 'react-select';
+import Nav from '../Navbar/Navadmin';
+import Swal from 'sweetalert2';
 
 
 
@@ -32,6 +34,7 @@ export default class User extends Component {
         mail :'', 
         motdepass :'', 
         role:'',
+        Etat:'',
         roles:'',
         
 
@@ -52,12 +55,13 @@ export default class User extends Component {
     
     //componentDidMount() est appelée immédiatement après que le composant est monté (inséré dans l’arbre).
     componentDidMount=async() =>{
-    this.GetData();
+      this.GetData();
     }
-    componentDidUpdate=()=>{
+   componentDidUpdate=()=>{
         this.GetData()
     }
     componentDidMount1=() =>{
+   
         const { id } = this.props.match.params;
         this.GetOne(id);
        console.log(id);
@@ -84,10 +88,12 @@ export default class User extends Component {
 
 
                    });
+                 
                    })
                    .catch(function (error) {
                    console.log(error);
                    })
+                   
                    }
                   Edituser=()=>{
                    const { id } = this.props.match.params;
@@ -104,6 +110,7 @@ export default class User extends Component {
                    mail :  this.state.mail, 
                    motdepass  :  this.state.motdepass , 
                     role : this.state.role,
+                    Etat: this.state.Etat,
 
                    };
                    console.log(id)
@@ -139,13 +146,31 @@ export default class User extends Component {
                 mail :  this.state.mail, 
                 motdepass  :  this.state.motdepass , 
                 roles : this.state.roles,
+                Etat : this.state.Etat,
         }; 
-        console.log(this.state.nom, this.state.prenom ,this.state.sexe,this.state.Route,this.state.ville,this.state.code_postal,this.state.telephone, this.state.login , this.state.mail , this.state.motdepass ,this.state.roles)
+        console.log(this.state.nom, this.state.prenom ,this.state.sexe,this.state.Route,this.state.ville,this.state.code_postal,this.state.telephone, this.state.login , this.state.mail , this.state.motdepass ,this.state.roles,this.state.Etat)
             API.post('/Create',UserObject )
-            .then(res => console.log(res.data));
+            .then((response)=> {
+              console.log(response)
+              console.log(response.data)
+              if (response.data == 'existe!'){
+                Swal.fire({
+                 
+                  text: 'Client existe !',
+                  icon: 'warning',
+       
+                  confirmButtonColor: 'black',
+                 
+                  confirmButtonText: 'OK'
+                  })
+                  
            
-           }
+              }
+              console.log(response)
+              console.log(response.data)
            
+            });
+          }
            handleChange= (e)=> {
             let nam = e.target.name;
             let val = e.target.value;       
@@ -153,7 +178,7 @@ export default class User extends Component {
             
            }
            handleChange_role= (e)=> {
-           this.setState({ role: e.value});
+           this.setState({ roles: e.value});
            }
            
           
@@ -185,6 +210,7 @@ const role = [
   { field: 'mail', headerName: 'Mail' , width: 150 },
   { field: 'motdepass', headerName: 'Mot de passe' , width: 150 },
   { field: 'roles', headerName: 'roles' , width: 150 },
+  { field: 'Etat', headerName: 'Etat' , width: 150 },
             
    
      ]; 
@@ -196,7 +222,8 @@ const role = [
         
        
         <div>
-             
+          <Nav></Nav>
+             <div className="utilisateur">
              <h1> Gestion  utilisateurs </h1>
              <SearchPanel  visible={true}  />
             
@@ -232,6 +259,7 @@ const role = [
         this.setState({mail:selectedRows[0].mail})
         this.setState({motdepass:selectedRows[0].motdepass})
         this.setState({roles:selectedRows[0].roles})
+        this.setState({Etat:selectedRows[0].Etat})
        
         
       }}
@@ -291,7 +319,7 @@ const role = [
        </div>
        <div className="newUserItem">
          <label>Téléphone :</label>
-         <input type="tel" value={this.state.telephone} onChange={this.handleChange}  name="telephone" placeholder="+216 **"  required/>
+         <input type="tel" value={this.state.telephone} onChange={this.handleChange}  name="telephone" pattern="[0-9]{2}[0-9]{3}[0-9]{3}"  placeholder="+216 **"  required/>
        </div>
        <div className="newUserItem">
        <label>Login :</label>
@@ -313,6 +341,17 @@ const role = [
         <Select   options={role}  onChange={this.handleChange_role.bind(this)} />
         <input type="text"  value={this.state.roles} readonly/>
           </div>
+
+          <div className="newUserItem">
+          <label>sexe:</label>
+          <div className="newUserGender">
+            <input type="radio" name="Etat" id="Active" value='Active'  onChange={this.handleChange}   checked={this.state.Etat=='Active'}/>
+            <label for="female">Active :</label>
+            <input type="radio" name="Etat" id="Desactive" value='Desactive' onChange={this.handleChange}  checked={this.state.Etat=='Desactive'} />
+            <label for="male">Desactive :</label>
+            
+          </div>
+        </div>
     <br></br>
     <div>
        <button  type="submit" onClick={this.AddUser} className="newUserButton">Ajouter </button>
@@ -321,6 +360,7 @@ const role = [
        </form>
     </div>
     </fieldset>
+    </div>
   </div>
   
     );  

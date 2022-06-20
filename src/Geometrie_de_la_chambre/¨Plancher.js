@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Select from 'react-select';
 import '../Geometrie_de_la_chambre/Mur.css';
 import API from '../Api/Api';
-
+import Nav from '../Navbar/Navadmin'
 
 
 export default class Plancher extends Component {
@@ -10,10 +10,20 @@ export default class Plancher extends Component {
         super(props);
         this.state = {
             libelle:'',
-            contact :'',
-            Vide:'',
+            contact_externe :'',
+            vide_sanitaire:'',
             libelle_type:'',
             libelle_Materiaux:'',
+            epaisseur:'',
+            Type_SurfaceInterne:'',
+            Epaisseur_SurfaceInterne:'',
+            Materiaux_SurfaceInterne:'',
+
+            Epaisseur_SurfaceExterne:'',
+            Type_SurfaceExterne:'',
+            Materiaux_SurfaceExterne:'',
+            Isolant_Materiaux:'',
+            Isolant_Epaisseur:'',
 
             redirect: null,
             Orientation: [],
@@ -45,8 +55,8 @@ export default class Plancher extends Component {
         }))
    
         this.setState({Orientation: options})
-        this.setState({Contact:'Terre'})
-        this.setState({Vide:'Non'})
+        this.setState({contact_externe:'Terre'})
+        this.setState({vide_sanitaire:'Non'})
    
       }
 
@@ -60,7 +70,7 @@ export default class Plancher extends Component {
           "label": d.libelle_contact
         }))
    
-        this.setState({Contact: options})
+        this.setState({contact_externe: options})
    
       }
 
@@ -78,18 +88,54 @@ export default class Plancher extends Component {
         this.setState({Type: options})
    
       }
+      AddPlancher=()=>{ 
+        const PlancherObject = {
+          id_plancher:this.state.id_plancher,
+           contact_externe : this.state.contact_externe,
+           vide_sanitaire:this.state.vide_sanitaire,
+           epaisseur:this.state.epaisseur,
 
-      async getMateriaux(){
-        const res = await API.get('/getmateriaux')
-        const data = res.data
+  
+         id_orientation : this.state.id_orientation,
+         
+         Type_SurfaceInterne : this.state.Type_SurfaceInterne,
+         Materiaux_SurfaceInterne : this.state.Materiaux_SurfaceInterne,
+         Epaisseur_SurfaceInterne : this.state.Epaisseur_SurfaceInterne,
        
-   
-        const options = data.map(d => ({
-          "value" : d.libelle_metaux,
-          "label": d.libelle_metaux
-        }))
-   
-        this.setState({Materiaux: options})
+         Type_SurfaceExterne:this.state.Type_SurfaceExterne,
+         Materiaux_SurfaceExterne:this.state.Materiaux_SurfaceExterne,  
+         Epaisseur_SurfaceExterne : this.state.Epaisseur_SurfaceExterne, 
+          //Epaisseur_SurfaceInterne : this.state.Epaisseur_SurfaceInterne,
+         Isolant_Materiaux:this.state.Isolant_Materiaux,
+         Isolant_Epaisseur:this.state.Isolant_Epaisseur,   
+         
+
+    }; 
+  
+        API.post('/InsertPlancher',PlancherObject )
+        .then(res => console.log(res.data));
+       
+       }
+
+       async getMateriaux(typeSur){
+        var result
+        if (typeSur == 'Beton'){
+          result = await API.get('/getconstruction')
+       
+          
+        }else{
+          // TODO , route / get.... 
+          result = await API.get('/getmetaux')
+         // result.data.push({libelle_metaux: 'test'})
+        }
+          const data = result.data
+          const options = data.map(d => ({
+            "value" :  d.libelle,
+            "label": d.libelle
+          }))
+          this.setState({Materiaux: options})
+          console.log('Ma',this.state.Materiaux)
+        
    
       }
       componentDidMount=async() =>{
@@ -105,6 +151,7 @@ export default class Plancher extends Component {
             this.setState({libelle:e.value});
             this.setState({libelle_contact:e.value});
             this.setState({libelle_type:e.value})
+    
            }
            handleChange_first = (e) => {
                      
@@ -122,11 +169,32 @@ export default class Plancher extends Component {
               })
             }
             
-             console.log('Contact',e.value);
-            this.setState({Contact:e.value});
+             console.log('contact_externe',e.value);
+            this.setState({contact_externe:e.value});
+            this.setState({Materiaux_SurfaceExterne:e.value})
             
           }
+          handelChange_fourth = (e) => {
+            this.setState({Type_SurfaceInterne:e.value})
+            this.getMateriaux(e.value)
+          }
+          
+          handelChange_fifth= (e) => {
+                    
+            let nam = e.target.name;
+             let val = e.target.value;
 
+               this.setState({[nam]: val}); 
+              
+          }
+          handleChange_third = (e) => {
+            
+            this.setState({Type_SurfaceExterne:e.value})
+             console.log('Type_SurfaceExterne',e.value);
+             this.getMateriaux(e.value)
+            //this.setState({Type_SurfaceExterne:this.state.Type_SurfaceExterne})
+       
+          }
           handleChange_Second = (e) => {
                      
          
@@ -143,20 +211,26 @@ export default class Plancher extends Component {
               })
             }
             
-             console.log('Vide',e.value);
-            this.setState({Vide:e.value});
+             console.log('vide_sanitaire',e.value);
+            this.setState({vide_sanitaire:e.value});
             
+          }
+          handelChange_sixth= (e) => {
+            this.setState({Materiaux_SurfaceInterne:e.value})
+          }
+          handelChange_isolant= (e) => {
+            this.setState({Isolant_Materiaux:e.value})
           }
            
 
    
     render(){
-      const Vide = [
+      const vide_sanitaire = [
             { value: 'Oui', label: 'Oui' },
             { value: 'Non', label: 'Non' },
            
           ]
-          const Contact = [
+          const contact_externe = [
             { value: 'Terre', label: 'Terre' },
             { value: 'un autre local', label: 'un autre local' },
            
@@ -174,21 +248,23 @@ export default class Plancher extends Component {
 
     return(
         <div>
+          <Nav/>
+          <div style={{ marginTop:'100px'}}>
           <h1>Géométrie de la Chambre froide</h1>
        <div className="nature">
         
-        <input type="text" placeholder="Latitude" value={sessionStorage.getItem('Latitude')} onChange={this.handleChange_second}
+        <input type="text" placeholder="type de chambre" value={sessionStorage.getItem('Latitude')} onChange={this.handleChange_second}
        name="Latitude" required />
       </div><br/>
 
-           <fieldset className='plancher'>
+           <fieldset className='plancher' >
                 <legend>Plancher : </legend>
 
                
                 <h2 className="select">Température du local en contact :</h2>
                 <div className="newUserItem">
                     <label>Contact externe :</label>
-                    <Select className="select"  options={Contact}  defaultValue={sessionStorage.getItem('disbaleContact')==='un autre local'? Contact[1]:Contact[0]} onChange={this.handleChange_first.bind(this)}  />
+                    <Select className="select"  options={contact_externe}  defaultValue={sessionStorage.getItem('disbaleContact')==='un autre local'? contact_externe[1]:contact_externe[0]} onChange={this.handleChange_first.bind(this)}  />
                 </div>
                 <div className="newUserItemE">
                      <label>Si "un autre local"  :</label>
@@ -197,67 +273,68 @@ export default class Plancher extends Component {
                 </div>
                 <div className="newUserItem">
                     <label>Vide sanitaire :</label>
-                    <Select className="select" defaultValue={sessionStorage.getItem('disbaleVide')==='OUI'? Vide[1]:Vide[0]}   onChange={this.handleChange_Second.bind(this)} options={Vide}   />
+                    <Select  name="vide_sanitaire" className="select" defaultValue={sessionStorage.getItem('disbaleVide')==='OUI'? vide_sanitaire[1]:vide_sanitaire[0]}   onChange={this.handleChange_Second.bind(this)} options={vide_sanitaire}   />
                 </div>
                 <div className="newUserItemE">
                      <label>Epaisseur (mm)  :</label>
                      <input className="select" type="Number" placeholder="Epaisseur (mm)" disabled={sessionStorage.getItem('disbaleVide')!=='OUI'}  
-                     name="Epaisseur"   onChange={this.handleChange}/>
+                     name="epaisseur" value={this.state.epaisseur}   onChange={this.handelChange_fifth}/>
                 </div>  <br/>
                 <fieldset className="compo">
                     <legend>Composition  </legend>
                 <h3 className="select">Surface externe :</h3>
                 <div className="newUserItem">
                     <label>Type :</label>
-                    <Select  className="select" options={this.state.Type} onChange={this.handleChange.bind(this)}  />
+                    <Select  className="select" options={this.state.Type} onChange={this.handleChange_third.bind(this)} DefaultValue={sessionStorage.getItem('liste')==='Beton'? this.state.Type[1]:this.state.Type[0]} />
                 </div>
                 <div className="newUserItemE">
                     <label>Matériaux :</label>
-                    <Select   options={this.state.Materiaux} onChange={this.handleChange.bind(this)}  />
+                    <Select   options={this.state.Materiaux} onChange={this.handleChange_first.bind(this)}  />
                
                 </div>
                 <div className="newUserItem">
                      <label>Epaisseur (mm)  :</label>
-                     <input type="Number" placeholder="Epaisseur (mm)"  
-                     name="Ep"  />
+                     <input type="Number" placeholder="Epaisseur (mm)" value={this.state.Epaisseur_SurfaceExterne} onChange={this.handelChange_fifth} 
+                     name="Epaisseur_SurfaceExterne"  />
                 </div>
 
                 <h3 className="select">Surface Interne :</h3>
                 <div className="newUserItem">
                     <label>Type :</label>
-                    <Select  className="select" options={this.state.Type} onChange={this.handleChange.bind(this)}  />
+                    <Select  className="select" options={this.state.Type} onChange={this.handelChange_fourth.bind(this)} DefaultValue={sessionStorage.getItem('liste')==='Beton'? this.state.Type[1]:this.state.Type[0]}  />
                 </div>
                 <div className="newUserItemE">
                     <label>Matériaux :</label>
-                    <Select   options={this.state.Materiaux} onChange={this.handleChange.bind(this)}  />
+                    <Select   options={this.state.Materiaux} onChange={this.handelChange_sixth.bind(this)}  />
                 </div>
                 <div className="newUserItem">
                      <label>Epaisseur (mm)  :</label>
-                     <input type="Number" placeholder="Epaisseur (mm)"  
-                     name="Ep"  />
+                     <input type="Number" placeholder="Epaisseur (mm)" value={this.state.Epaisseur_SurfaceInterne} onChange={this.handelChange_fifth}  
+                     name="Epaisseur_SurfaceInterne"  />
                 </div>
 
                 <h3 className="select">Isolant :</h3>
                
                 <div className="newUserItem">
                     <label>Matériaux :</label>
-                    <Select className="select"  options={this.state.Materiaux} onChange={this.handleChange.bind(this)}  />
+                    <Select className="select"  options={this.state.Materiaux} onChange={this.handelChange_isolant.bind(this)}  />
                 </div>
                 <div className="newUserItemE ">
                      <label>Epaisseur (mm)  :</label>
-                     <input type="Number" placeholder="Epaisseur (mm)"  
-                     name="Ep"  />
+                     <input type="Number" placeholder="Epaisseur (mm)"  value={this.state.Isolant_Epaisseur} onChange={this.handelChange_fifth}  
+                     name="Isolant_Epaisseur"  />
                 </div>
                 </fieldset>
 
              
 
            </fieldset>
+           <div >
            <a href="/plafond"><button   className="newUserButton">Retour  </button></a>
-           <a href="/porte"><button  type="submit"  className="newUserButton">Suivant  </button></a>
-           
+           <a href="/porte"><button  onClick={this.AddPlancher}  type="submit"  className="newUserButton">Suivant  </button></a>
+           </div>
 
-
+           </div>
        
         </div>
     )

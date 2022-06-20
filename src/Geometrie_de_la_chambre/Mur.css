@@ -38,7 +38,7 @@
   }
   .compo{
     margin-left: 5px;
-    height: 457px;
+    height: 530px;
     width: 1245px;
   }
   
@@ -119,21 +119,9 @@ background-color:darkgrey;
 }
 .Mur1{
   margin-left: 2px;
-  height: 750px;
+  margin-top: 20px;
+  height: 855px;
   width: 1000px;
 }
-.Mur2{
-  margin-left: 2px;
-  height: 750px;
-  width: 1255px;
-}
- .plancher{
-  margin-left: 2px;
-  height: 680px;
-  width: 1255px;
- }
- .Porte{
-  margin-left: 2px;
-  height: 900px;
-  width: 1255px; 
- }
+
+
